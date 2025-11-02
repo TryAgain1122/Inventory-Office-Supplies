@@ -5,17 +5,19 @@
  */
 package inventory_office_supplies;
 
+import Database_config.DbConnection;
+
 /**
  *
  * @author luisr
  */
 public class Inventory_office_supplies {
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String[] args) {
-        // TODO code application logic here
+        DbConnection db = new DbConnection();
+        new SplashScreen().setVisible(true);
+        
     }
     
 }
