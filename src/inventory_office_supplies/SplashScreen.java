@@ -107,7 +107,7 @@ private void progressBar() {
                 .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(90, 90, 90)
                 .addComponent(progressbar1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(59, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -118,7 +118,9 @@ private void progressBar() {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 26, Short.MAX_VALUE))
         );
 
         pack();
@@ -130,11 +132,12 @@ private void progressBar() {
      */
     public static void main(String args[]) {
         
-        try {
-            FlatLightLaf.setup();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            FlatLightLaf.setup();
+//            UIManager.setLookAndFeel(new FlatLightLaf());
+//        } catch(Exception e) {
+//            e.printStackTrace();
+//        }
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SplashScreen().setVisible(true);

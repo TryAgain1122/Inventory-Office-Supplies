@@ -10,6 +10,7 @@ import Styles.ButtonStyles;
 import Styles.GradientPanel;
 import Styles.TextFieldStyle;
 import com.formdev.flatlaf.FlatLightLaf;
+import inventory_office_supplies.AdminDashboard;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,6 +55,7 @@ public class AddUser extends javax.swing.JFrame {
         selectRole.setSelectedIndex(0);
         
         ButtonStyles.setDark(btnAdd);
+        ButtonStyles.setDelete(btnCancel);
         revalidate();
         repaint();
     }
@@ -70,6 +72,7 @@ public class AddUser extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         txtAddPassword = new javax.swing.JPasswordField();
         txtEmail = new javax.swing.JTextField();
+        btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -111,6 +114,14 @@ public class AddUser extends javax.swing.JFrame {
             }
         });
 
+        btnCancel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -121,19 +132,19 @@ public class AddUser extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(76, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(selectRole, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtAddFullname)
-                                .addComponent(txtAddPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
-                                .addComponent(txtUsername)
-                                .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING)))
-                        .addGap(77, 77, 77))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(146, 146, 146))))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(selectRole, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtAddFullname)
+                            .addComponent(txtAddPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                            .addComponent(txtUsername)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING))))
+                .addGap(77, 77, 77))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -150,9 +161,11 @@ public class AddUser extends javax.swing.JFrame {
                 .addComponent(txtAddPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26)
                 .addComponent(selectRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
-                .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addGap(41, 41, 41)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(58, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -203,10 +216,10 @@ public class AddUser extends javax.swing.JFrame {
           return;
         }
        
-        if (!email.matches("@")) {
-            JOptionPane.showMessageDialog(this, "Invalid email");
-            return;
-        }
+//        if (!email.matches("@")) {
+//            JOptionPane.showMessageDialog(this, "Invalid email");
+//            return;
+//        }
         try {
             String sql = "INSERT INTO users_tbl (username, password, role, fullname, email) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pst = conn.prepareStatement(sql);
@@ -219,6 +232,7 @@ public class AddUser extends javax.swing.JFrame {
             int rows = pst.executeUpdate();
             if (rows > 0) {
                 JOptionPane.showMessageDialog(this, "User Added Successfully");
+//                new AdminDashboard().setVisible(true);
                 this.dispose();
             }
         } catch (SQLException e) {
@@ -236,14 +250,14 @@ public class AddUser extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEmailActionPerformed
 
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+//        new AdminDashboard().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
 
     public static void main(String args[]) {
-        
-        try {
-            FlatLightLaf.setup();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+      
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -255,6 +269,7 @@ public class AddUser extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnCancel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JComboBox<String> selectRole;

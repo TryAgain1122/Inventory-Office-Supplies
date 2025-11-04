@@ -23,12 +23,12 @@ import javax.swing.JOptionPane;
 public class EditUsers extends javax.swing.JFrame {
 
     private int userId;
-    private AdminDashboard dashboard;
+    private UserPanel userPanel;
     
-    public EditUsers(String fullname, String email, String username, String password, String role, int userId, AdminDashboard dashboard) {
+    public EditUsers(String fullname, String email, String username, String password, String role, int userId, UserPanel userPanel) {
         initComponents();
         this.userId = userId;
-        this.dashboard = dashboard;
+        this.userPanel = userPanel;
         
         txtFullname.setText(fullname);
         txtEmail.setText(email);
@@ -46,6 +46,19 @@ public class EditUsers extends javax.swing.JFrame {
         TextFieldStyle.applyUnderlineStyle(txtEmail, "Enter Email");
         TextFieldStyle.applyUnderlineStyle(txtUsername, "Enter Username");
         TextFieldStyle.applyUnderlineStyle(txtPassword, "Enter Password");
+        
+        //Combobox styles
+        selectRole.putClientProperty("JComponent.roundRect", true);
+        selectRole.setBackground(new java.awt.Color(180, 180, 180));
+        selectRole.setForeground(new java.awt.Color(30, 30, 30));
+        selectRole.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 16));
+        selectRole.setFocusable(false);
+        selectRole.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        
+//        selectRole.setModel(new javax.swing.DefaultComboBoxModel<>(
+//                new String[] {"Select Category", "Admin", "Staff"}
+//        ));
+//        selectRole.setSelectedIndex(0);
         
         ButtonStyles.setDark(btnEdit);
         ButtonStyles.setDelete(btnCancel);
@@ -195,11 +208,14 @@ public class EditUsers extends javax.swing.JFrame {
     }//GEN-LAST:event_txtEmailActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-          try {
+
+        try {
             DbConnection db = new DbConnection();
-            Connection conn = db.getConnection();
+            Connection conn;
+            PreparedStatement pst;
+            conn = db.getConnection();
             String sql = "UPDATE users_tbl SET fullname = ?, email = ?, username = ?, password = ?, role = ? WHERE user_id = ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
+            pst = conn.prepareStatement(sql);
 
             pst.setString(1, txtFullname.getText());
             pst.setString(2, txtEmail.getText());
@@ -212,8 +228,8 @@ public class EditUsers extends javax.swing.JFrame {
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(this, "User updated successfully!");
                 
-                if (dashboard != null) {
-                    dashboard.refreshUsersTable();
+                if (userPanel != null) {
+                    userPanel.refreshUsersTable();
                 }
                 this.dispose();
             } else {

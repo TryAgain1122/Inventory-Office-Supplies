@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Styles;
 
 import java.awt.Color;
@@ -23,6 +19,7 @@ public class TextFieldStyle {
         //Show clear button
         textField.putClientProperty("JTextField.showClearButton", true);
         
+        //For focused and unfocused color
         Color unfocusedLine = new Color(210, 210, 210);
         Color focusedLine = new Color(30, 30, 30);
         
@@ -42,5 +39,18 @@ public class TextFieldStyle {
                 textField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, unfocusedLine));
             }
         });
+    }
+    
+    public static void customInputFields(JTextField textField, String placeholder) {
+        textField.putClientProperty("JTextField.placeholderText", placeholder);
+        textField.putClientProperty("JComponent.roundRect", true);
+        textField.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 16));
+    }
+    
+    public static void SearchStyle(JTextField textField, String placeholder) {
+        textField.putClientProperty("JTextField.placeholderText", placeholder);
+        textField.putClientProperty("JComponent.roundRect", true);
+        textField.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 16));
+        textField.setPreferredSize(new java.awt.Dimension(512, 40));
     }
 }

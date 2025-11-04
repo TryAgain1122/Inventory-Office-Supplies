@@ -7,6 +7,7 @@ package inventory_office_supplies;
 
 import Database_config.DbConnection;
 import Styles.GradientPanel;
+import Styles.ModalCustom;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -242,6 +243,11 @@ public LoginForm() {
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
         
+        if (username.isEmpty() || password.isEmpty()) {
+            ModalCustom.showWarning("Please enter both and username and password", "Missing fields");
+            return;
+        }
+        
         DbConnection db = new DbConnection();
         Connection conn = db.getConnection();
         
@@ -255,29 +261,25 @@ public LoginForm() {
             if (rs.next()) {
                 String role = rs.getString("role");
                 String fullname = rs.getString("fullname");
-                JOptionPane.showMessageDialog(this, "Welcome" + fullname + "("+ role +")");
+                ModalCustom.showStyledInfo("Welcome " + fullname + " (" + role + ")", "Login Successfully");
                 
                 if (role.equalsIgnoreCase("Admin")) {
                     new AdminDashboard().setVisible(true);
-                    this.dispose();
+   
                 } else if (role.equalsIgnoreCase("Staff")) {
-                    new StaffPanel().setVisible(true);
-                    this.dispose();
+                    new StaffDashboard().setVisible(true);
                 }
+                this.dispose();
             } 
              else {
-               if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter username or password.");
-                } else {
-                   JOptionPane.showMessageDialog(this, "Invalid username or password");
-               }  
+               ModalCustom.showError("Invalid username or password", "Login Failed");
             }
             
             rs.close();
             pst.close();
             db.closeConnection();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+            ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 
@@ -286,11 +288,11 @@ public LoginForm() {
      */
     public static void main(String args[]) {
       
-        try { 
-             FlatLightLaf.setup();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try { 
+//             FlatLightLaf.setup();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
