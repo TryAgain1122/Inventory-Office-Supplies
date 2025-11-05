@@ -53,4 +53,38 @@ public class ButtonStyles {
         button.putClientProperty("JButton.buttonType", "roundRect");
         setColor(button, new Color(45, 45, 45), Color.WHITE); // Dark gray
     }
+    
+    //Pagination
+    public static void setPagination(JButton button) {
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        button.putClientProperty("JButton.focusWidth", 0);
+        
+        Color bgColor = new Color(220, 220, 220);
+        Color textColor = new Color(50, 50, 50);
+        
+        button.setBackground(bgColor);
+        button.setForeground(textColor);
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                button.setBackground(new Color(200, 200, 200));
+            }
+            
+            @Override
+            public void mouseExited (java.awt.event.MouseEvent e) {
+                button.setBackground(bgColor);
+            }
+        });
+    }
+    
+    public static void setPaginationActive(JButton button) {
+        button.putClientProperty("JButton.buttonType", "roundRect");
+        Color activeColor = new Color(52, 152, 219);
+        setColor(button, activeColor, Color.WHITE);
+    }
 }

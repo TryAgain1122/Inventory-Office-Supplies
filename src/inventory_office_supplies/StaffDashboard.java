@@ -45,6 +45,7 @@ public class StaffDashboard extends javax.swing.JFrame {
         lblLogout = new javax.swing.JLabel();
         lblHome = new javax.swing.JLabel();
         mainPanel = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -173,15 +174,24 @@ public class StaffDashboard extends javax.swing.JFrame {
                 .addGap(56, 56, 56))
         );
 
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        jLabel9.setText("Staff Panel");
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 592, Short.MAX_VALUE)
+            .addGroup(mainPanelLayout.createSequentialGroup()
+                .addGap(80, 80, 80)
+                .addComponent(jLabel9)
+                .addContainerGap(329, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(mainPanelLayout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jLabel9)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -196,25 +206,23 @@ public class StaffDashboard extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(sideBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblUserClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUserClickMouseClicked
-        if (userPanel == null) {
-            userPanel = new UserPanel();
-        }
-        switchPanel(userPanel);
+
     }//GEN-LAST:event_lblUserClickMouseClicked
 
     private void txtCategoryyClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCategoryyClickMouseClicked
-        switchPanel(categotryPanel);
+    
     }//GEN-LAST:event_txtCategoryyClickMouseClicked
 
     private void lblInventoryClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblInventoryClickMouseClicked
-        switchPanel(inventoryPanel);
+      
 
     }//GEN-LAST:event_lblInventoryClickMouseClicked
 
@@ -260,6 +268,7 @@ public class StaffDashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel lblCategory;
     private javax.swing.JLabel lblDashboard;
     private javax.swing.JLabel lblHome;
