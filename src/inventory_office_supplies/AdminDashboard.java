@@ -20,8 +20,8 @@ public class AdminDashboard extends javax.swing.JFrame {
     
     private UserPanel userPanel = new UserPanel();
     private InventoryPanel inventoryPanel = new InventoryPanel();
-private ProductPanel productPanel = new ProductPanel();
-private CategotryPanel categotryPanel = new CategotryPanel(productPanel);
+    private ProductPanel productPanel = new ProductPanel(inventoryPanel);
+    private CategotryPanel categotryPanel = new CategotryPanel(productPanel);
     
     
     public AdminDashboard() {

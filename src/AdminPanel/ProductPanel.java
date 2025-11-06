@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,14 +24,17 @@ import javax.swing.table.DefaultTableModel;
  * @author luisr
  */
 public class ProductPanel extends javax.swing.JPanel {
-
+    
+    private InventoryPanel inventoryPanel = new InventoryPanel();
     private int currentPage = 1;
     private int rowsPerPage = 5;
     private int totalRows = 0;
     private boolean isEditing = false;
     private int editingProductId = -1;
-    public ProductPanel() {
+    
+    public ProductPanel(InventoryPanel inventoryPanel) {
         initComponents();
+        this.inventoryPanel = inventoryPanel;
         setUpProductTable();
         loadCategoriesToComboBox();
         loadProducts();
@@ -413,68 +417,85 @@ public class ProductPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        String productName = txtProductName.getText().trim();
-        String unit = txtUnit.getText().trim();
-        int quantity = (int) spinnerQty.getValue();
-        String priceText = txtPrice.getText().trim();
-        String selectedCategory = (String) selectCategory.getSelectedItem();
-        
-        if (productName.isEmpty() || unit.isEmpty() || priceText.isEmpty() || selectedCategory.isEmpty()) {
-            ModalCustom.showWarning("Please fill all fields properly!", "Warning");
+    String productName = txtProductName.getText().trim();
+    String unit = txtUnit.getText().trim();
+    int quantity = (int) spinnerQty.getValue();
+    String priceText = txtPrice.getText().trim();
+    String selectedCategory = (String) selectCategory.getSelectedItem();
+
+    if (productName.isEmpty() || unit.isEmpty() || priceText.isEmpty() || selectedCategory.isEmpty()) {
+        ModalCustom.showWarning("Please fill all fields properly!", "Warning");
+        return;
+    }
+
+    try {
+        double price = Double.parseDouble(priceText);
+        DbConnection db = new DbConnection();
+        Connection conn = db.getConnection();
+
+        // Get category ID
+        String catSql = "SELECT category_id FROM categories_tbl WHERE category_name = ?";
+        PreparedStatement catPst = conn.prepareStatement(catSql);
+        catPst.setString(1, selectedCategory);
+        ResultSet rs = catPst.executeQuery();
+
+        int categoryId = 0;
+        if (rs.next()) {
+            categoryId = rs.getInt("category_id");
         }
-        
-        try {
-            double price = Double.parseDouble(priceText);
-            DbConnection db = new DbConnection();
-            Connection conn = db.getConnection();
-            
-            String catSql = "SELECT category_id FROM categories_tbl WHERE category_name = ?";
-            PreparedStatement catPst = conn.prepareStatement(catSql);
-            catPst.setString(1, selectedCategory);
-            ResultSet rs = catPst.executeQuery();
-            
-            int categoryId = 0;
-            if (rs.next()) {
-                categoryId = rs.getInt("category_id");
+
+        // Insert into products_tbl
+        String sql = "INSERT INTO products_tbl (category_id, product_name, quantity, unit, price) VALUES(?, ?, ?, ?, ?)";
+        PreparedStatement pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        pst.setInt(1, categoryId);
+        pst.setString(2, productName);
+        pst.setInt(3, quantity);
+        pst.setString(4, unit);
+        pst.setDouble(5, price);
+
+        int rows = pst.executeUpdate();
+        if (rows > 0) {
+            // Get the generated product_id
+            ResultSet generatedKeys = pst.getGeneratedKeys();
+            int productId = 0;
+            if (generatedKeys.next()) {
+                productId = generatedKeys.getInt(1);
             }
-            
-            String sql = "INSERT INTO products_tbl (category_id, product_name, quantity, unit, price) VALUES(?, ?, ?, ?, ?)";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setInt(1, categoryId);
-            pst.setString(2, productName);
-            pst.setInt(3, quantity);
-            pst.setString(4, unit);
-            pst.setDouble(5, price);
-            
-            int rows = pst.executeUpdate();
-            if (rows > 0) {
-                ModalCustom.showInfo("Product added successfully!", "Successfully");
 
-                // Recount total rows
-                String countSql = "SELECT COUNT(*) FROM products_tbl";
-                PreparedStatement countPst = conn.prepareStatement(countSql);
-                ResultSet countRs = countPst.executeQuery();
-                if (countRs.next()) {
-                    totalRows = countRs.getInt(1);
-                }
+            // Insert IN log into inventory_logs_tbl
+            String logSql = "INSERT INTO inventory_logs_tbl (product_id, user_id, stock_history, quantity, remarks) VALUES (?, ?, 'IN', ?, ?)";
+            PreparedStatement logPst = conn.prepareStatement(logSql);
+            logPst.setInt(1, productId);
+            logPst.setInt(2, 1); // <-- dito ilagay ang current user_id (admin) na nag-add
+            logPst.setInt(3, quantity);
+            logPst.setString(4, "Initial stock added");
+            logPst.executeUpdate();
+            inventoryPanel.loadInventoryLogsTable();
 
-                // Compute total pages
-                int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
+            ModalCustom.showInfo("Product added successfully!", "Successfully");
 
-                // Always go to last page where the new item would be
-                currentPage = totalPages;
+            // Recount total rows and update pagination
+            String countSql = "SELECT COUNT(*) FROM products_tbl";
+            PreparedStatement countPst = conn.prepareStatement(countSql);
+            ResultSet countRs = countPst.executeQuery();
+            if (countRs.next()) {
+                totalRows = countRs.getInt(1);
+            }
+            int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
+            currentPage = totalPages;
 
-                loadProducts();
-                updatePageInfo();
+            loadProducts();
+            updatePageInfo();
 
-                // Reset fields
-                txtProductName.setText("");
-                txtUnit.setText("");
-                txtPrice.setText("");
-                spinnerQty.setValue(0);
-                selectCategory.setSelectedIndex(0);
-}
-            db.closeConnection();
+            // Reset fields
+            txtProductName.setText("");
+            txtUnit.setText("");
+            txtPrice.setText("");
+            spinnerQty.setValue(0);
+            selectCategory.setSelectedIndex(0);
+        }
+
+        db.closeConnection();
         } catch(SQLException e) {
             ModalCustom.showError("Invalid Connection: " + e.getMessage(), "Error");
         }
