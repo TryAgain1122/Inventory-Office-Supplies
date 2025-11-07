@@ -6,9 +6,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DbConnection {
-    private final String URL = "jdbc:mysql://localhost:3306/inventory_office_supplies_db";
+    private final String URL = "jdbc:mysql://localhost:3306/db_gproject";
     private final String USERNAME = "root";
-    private final String PASSWORD = "P@ssw0rd!";
+    private final String PASSWORD = "";
 //    private final String PASSWORD = "Dashataran1122@";
     
     private Connection conn;

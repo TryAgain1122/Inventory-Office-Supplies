@@ -19,7 +19,7 @@ import javax.swing.UIManager;
  *
  * @author luisr
  */
-public class StaffPanel extends javax.swing.JFrame {
+public class StaffPanelDashboard extends javax.swing.JFrame {
 
     StaffDefaultPanel staffDefaultPanel = new StaffDefaultPanel();
     InventoryPanel inventoryPanel = new InventoryPanel();
@@ -28,7 +28,7 @@ public class StaffPanel extends javax.swing.JFrame {
     /**
      * Creates new form StaffPanel
      */
-    public StaffPanel() {
+    public StaffPanelDashboard() {
         initComponents();
         openPanel(staffDefaultPanel);
     }
@@ -80,7 +80,6 @@ public class StaffPanel extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(32767, 32767));
-        setPreferredSize(new java.awt.Dimension(1005, 700));
 
         leftPanel.setBackground(new java.awt.Color(204, 204, 204));
         leftPanel.setMaximumSize(new java.awt.Dimension(307, 0));
@@ -145,7 +144,7 @@ public class StaffPanel extends javax.swing.JFrame {
                     .addGroup(leftPanelLayout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(dashBoardLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))
+                        .addComponent(dashBoardLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE))
                     .addGroup(leftPanelLayout.createSequentialGroup()
                         .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -286,7 +285,7 @@ public class StaffPanel extends javax.swing.JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                StaffPanel staffPanel = new StaffPanel();
+                StaffPanelDashboard staffPanel = new StaffPanelDashboard();
                 staffPanel.setVisible(true);
             }
         });
