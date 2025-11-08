@@ -6,7 +6,11 @@
 package AdminPanel;
 
 import Database_config.DbConnection;
+import Styles.ButtonStyles;
+import Styles.ComponentStyles;
 import Styles.ModalCustom;
+import Styles.TableStyles;
+import Styles.TextFieldStyle;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +31,10 @@ public class InventoryPanel extends javax.swing.JPanel {
     private Map<String, Integer> productMap = new HashMap<>();
     private Map<String, Integer> userMap = new HashMap<>();
     
+    private int currentPage = 1;
+    private int rowsPerPage = 5;
+    private int totalRows = 0;
+    
     public InventoryPanel() {
         initComponents();
         
@@ -34,6 +42,23 @@ public class InventoryPanel extends javax.swing.JPanel {
         group.add(rbtnAll);
         group.add(rbtnIn);
         group.add(rbtnOut);
+        
+         
+        TableStyles.applyDefault(tblInventoryLogs);
+        
+        TextFieldStyle.customInputFields(txtSearch, "Search... ");
+        ButtonStyles.setDark(btnNext);
+        ButtonStyles.setDark(btnPrev);
+        ButtonStyles.setAdd(btnSearch);
+        
+        ComponentStyles.styleRadio(rbtnAll);
+        ComponentStyles.styleRadio(rbtnIn);
+        ComponentStyles.styleRadio(rbtnOut);
+        
+        ComponentStyles.styleJCalendar(dateTo);
+        ComponentStyles.styleJCalendar(dateFrom);
+        
+
         
         rbtnAll.setSelected(true);
         cmbProductFilter.setSelectedIndex(0);
@@ -87,74 +112,118 @@ public class InventoryPanel extends javax.swing.JPanel {
     }
     
     public void loadInventoryLogsTable() {
-        DefaultTableModel model = (DefaultTableModel) tblInventoryLogs.getModel();
-        model.setRowCount(0);
-        DbConnection db = new DbConnection();
-        Connection conn = db.getConnection();
-        
-        try {
-            Integer selectedProductId = cmbProductFilter.getSelectedIndex() > 0
-                    ? productMap.get(cmbProductFilter.getSelectedItem().toString())
-                    : null;
-            
-            Integer selectedUserId = cmbUserFilter.getSelectedIndex() > 0
-                    ? userMap.get(cmbUserFilter.getSelectedItem().toString())
-                    : null;
-            
-            String stockType = null;
-            if (rbtnIn.isSelected()){
-                stockType = "IN";
-            } else if (rbtnOut.isSelected()) {
-                stockType = "OUT";
-            }
-            
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String fromDate = dateFrom.getDate() != null ? sdf.format(dateFrom.getDate()) + " 00:00:00" : "1970-01-01 00:00:00";
-            String toDate = dateTo.getDate() != null ? sdf.format(dateTo.getDate()) + " 23:59:59" : "9999-12-31 23:59:59";
-            
-                        
-                String sql = "SELECT "
-                + "il.log_id, "
-                + "p.product_name, "
-                + "u.fullname AS user_name, "
-                + "il.stock_history, "
-                + "il.quantity, "
-                + "il.date_inventory_logs "
-            + "FROM inventory_logs_tbl il "
-            + "JOIN products_tbl p ON il.product_id = p.product_id "
-            + "JOIN users_tbl u ON il.user_id = u.user_id "
-            + "WHERE 1=1";     
-                
-            if (selectedProductId != null) sql += " AND p.product_id = ?";
-            if (selectedUserId != null) sql += " AND u.user_id = ?";
-            if (stockType != null) sql += " AND il.stock_history = ?";
-            sql += " AND (il.date_inventory_logs BETWEEN ? AND ?) ORDER BY il.date_inventory_logs DESC";
-            
-            PreparedStatement pst = conn.prepareStatement(sql);
-            int index = 1;
-            if (selectedProductId != null) pst.setInt(index++, selectedProductId);
-            if (selectedUserId != null) pst.setInt(index++, selectedUserId);
-            if (stockType != null) pst.setString(index++, stockType);
-            pst.setString(index++, fromDate);
-            pst.setString(index++, toDate);
-            
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                model.addRow(new Object[] {
-                    rs.getInt("log_id"),
-                    rs.getString("product_name"),
-                    rs.getString("user_name"),
-                    rs.getString("stock_history"),
-                    rs.getInt("quantity"),
-                    rs.getTimestamp("date_inventory_logs")
-                });
-            }
-            rs.close();
-            pst.close();
-            conn.close();
-        } catch (SQLException e) {
-            ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
+         DefaultTableModel model = (DefaultTableModel) tblInventoryLogs.getModel();
+    model.setRowCount(0); // clear table
+    DbConnection db = new DbConnection();
+    Connection conn = db.getConnection();
+
+    try {
+        Integer selectedProductId = cmbProductFilter.getSelectedIndex() > 0
+                ? productMap.get(cmbProductFilter.getSelectedItem().toString())
+                : null;
+
+        Integer selectedUserId = cmbUserFilter.getSelectedIndex() > 0
+                ? userMap.get(cmbUserFilter.getSelectedItem().toString())
+                : null;
+
+        String stockType = null;
+        if (rbtnIn.isSelected()) stockType = "IN";
+        else if (rbtnOut.isSelected()) stockType = "OUT";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fromDate = dateFrom.getDate() != null ? sdf.format(dateFrom.getDate()) + " 00:00:00" : "1970-01-01 00:00:00";
+        String toDate = dateTo.getDate() != null ? sdf.format(dateTo.getDate()) + " 23:59:59" : "9999-12-31 23:59:59";
+
+        String searchText = txtSearch.getText().trim();
+
+        // --- COUNT total rows for pagination ---
+        String countSql = "SELECT COUNT(*) FROM inventory_logs_tbl il "
+                + "JOIN products_tbl p ON il.product_id = p.product_id "
+                + "JOIN users_tbl u ON il.user_id = u.user_id "
+                + "WHERE 1=1";
+        if (selectedProductId != null) countSql += " AND p.product_id = ?";
+        if (selectedUserId != null) countSql += " AND u.user_id = ?";
+        if (stockType != null) countSql += " AND il.stock_history = ?";
+        countSql += " AND (il.date_inventory_logs BETWEEN ? AND ?)";
+        if (!searchText.isEmpty()) countSql += " AND (p.product_name LIKE ? OR u.fullname LIKE ?)";
+
+        PreparedStatement countPst = conn.prepareStatement(countSql);
+        int idx = 1;
+        if (selectedProductId != null) countPst.setInt(idx++, selectedProductId);
+        if (selectedUserId != null) countPst.setInt(idx++, selectedUserId);
+        if (stockType != null) countPst.setString(idx++, stockType);
+        countPst.setString(idx++, fromDate);
+        countPst.setString(idx++, toDate);
+        if (!searchText.isEmpty()) {
+            countPst.setString(idx++, "%" + searchText + "%");
+            countPst.setString(idx++, "%" + searchText + "%");
         }
+
+        ResultSet rsCount = countPst.executeQuery();
+        if (rsCount.next()) totalRows = rsCount.getInt(1);
+        rsCount.close();
+        countPst.close();
+
+        // --- Fetch rows for current page ---
+        int offset = (currentPage - 1) * rowsPerPage;
+
+        String sql = "SELECT il.log_id, p.product_name, u.fullname AS user_name, "
+                + "il.stock_history, il.quantity, il.date_inventory_logs "
+                + "FROM inventory_logs_tbl il "
+                + "JOIN products_tbl p ON il.product_id = p.product_id "
+                + "JOIN users_tbl u ON il.user_id = u.user_id "
+                + "WHERE 1=1";
+        if (selectedProductId != null) sql += " AND p.product_id = ?";
+        if (selectedUserId != null) sql += " AND u.user_id = ?";
+        if (stockType != null) sql += " AND il.stock_history = ?";
+        sql += " AND (il.date_inventory_logs BETWEEN ? AND ?)";
+        if (!searchText.isEmpty()) sql += " AND (p.product_name LIKE ? OR u.fullname LIKE ?)";
+        sql += " ORDER BY il.date_inventory_logs DESC LIMIT ? OFFSET ?";
+
+        PreparedStatement pst = conn.prepareStatement(sql);
+        idx = 1;
+        if (selectedProductId != null) pst.setInt(idx++, selectedProductId);
+        if (selectedUserId != null) pst.setInt(idx++, selectedUserId);
+        if (stockType != null) pst.setString(idx++, stockType);
+        pst.setString(idx++, fromDate);
+        pst.setString(idx++, toDate);
+        if (!searchText.isEmpty()) {
+            pst.setString(idx++, "%" + searchText + "%");
+            pst.setString(idx++, "%" + searchText + "%");
+        }
+        pst.setInt(idx++, rowsPerPage);
+        pst.setInt(idx++, offset);
+
+        ResultSet rs = pst.executeQuery();
+        while (rs.next()) {
+            model.addRow(new Object[] {
+                rs.getInt("log_id"),
+                rs.getString("product_name"),
+                rs.getString("user_name"),
+                rs.getString("stock_history"),
+                rs.getInt("quantity"),
+                rs.getTimestamp("date_inventory_logs")
+            });
+        }
+
+        rs.close();
+        pst.close();
+        conn.close();
+
+        // --- Update pagination labels and buttons ---
+        updatePageInfo();
+
+    } catch (SQLException e) {
+        ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
+    }
+    }
+    
+    private void updatePageInfo () {
+        int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
+        lblPageText.setText(currentPage + " / " + totalPages);
+        
+        btnPrev.setEnabled(currentPage > 1);
+        btnNext.setEnabled(currentPage < totalPages);
     }
 
 
@@ -165,7 +234,7 @@ public class InventoryPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        btnSearch1 = new javax.swing.JButton();
+        btnSearch = new javax.swing.JButton();
         txtSearch = new javax.swing.JTextField();
         cmbProductFilter = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
@@ -180,29 +249,29 @@ public class InventoryPanel extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblInventoryLogs = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        btnPrev = new javax.swing.JButton();
+        lblPageText = new javax.swing.JLabel();
+        btnNext = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         cmbUserFilter = new javax.swing.JComboBox<>();
         rbtnAll = new javax.swing.JRadioButton();
         rbtnIn = new javax.swing.JRadioButton();
         rbtnOut = new javax.swing.JRadioButton();
         jLabel14 = new javax.swing.JLabel();
-        dateFrom = new com.toedter.calendar.JDateChooser();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         dateTo = new com.toedter.calendar.JDateChooser();
+        dateFrom = new com.toedter.calendar.JDateChooser();
 
         jLabel2.setText("jLabel2");
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel9.setText("Inventory logs");
 
-        btnSearch1.setText("Search");
-        btnSearch1.addActionListener(new java.awt.event.ActionListener() {
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearch1ActionPerformed(evt);
+                btnSearchActionPerformed(evt);
             }
         });
 
@@ -323,22 +392,25 @@ public class InventoryPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tblInventoryLogs);
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jButton1.setText("<< Prev");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnPrev.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnPrev.setText("Prev");
+        btnPrev.setToolTipText("");
+        btnPrev.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnPrevActionPerformed(evt);
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel1.setText("Page 1 of !0");
+        lblPageText.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblPageText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPageText.setText("Page 1 of !0");
 
-        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jButton2.setText("Next >>");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnNext.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnNext.setText("Next");
+        btnNext.setActionCommand("Next");
+        btnNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnNextActionPerformed(evt);
             }
         });
 
@@ -380,67 +452,71 @@ public class InventoryPanel extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addGap(24, 24, 24))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(55, 55, 55))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(118, 118, 118)
-                                .addComponent(jButton1)
-                                .addGap(33, 33, 33)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2))
-                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(55, 55, 55))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel14)
                                 .addGap(39, 39, 39)
                                 .addComponent(jLabel16)
-                                .addGap(12, 12, 12)
-                                .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(25, 25, 25)
-                                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(txtSearch)
-                                .addGap(18, 18, 18))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cmbProductFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(33, 33, 33)
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(rbtnAll)
-                                .addGap(18, 18, 18)
-                                .addComponent(rbtnIn)
-                                .addGap(26, 26, 26)
-                                .addComponent(rbtnOut)
-                                .addGap(74, 74, 74)))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbUserFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSearch1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18))))
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(cmbProductFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(33, 33, 33)
+                                        .addComponent(jLabel3)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rbtnAll)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(rbtnIn)
+                                        .addGap(26, 26, 26)
+                                        .addComponent(rbtnOut)
+                                        .addGap(58, 58, 58)
+                                        .addComponent(cmbUserFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(41, 41, 41))))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(191, 191, 191)
+                .addComponent(btnPrev)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblPageText, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnNext)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSearch1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(39, 39, 39)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cmbProductFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -451,32 +527,32 @@ public class InventoryPanel extends javax.swing.JPanel {
                         .addComponent(rbtnOut)
                         .addComponent(cmbUserFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(dateFrom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(dateTo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dateFrom, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(68, 68, 68))
+                    .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPageText, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(23, 23, 23))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -488,17 +564,24 @@ public class InventoryPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnSearch1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearch1ActionPerformed
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         loadInventoryLogsTable();
-    }//GEN-LAST:event_btnSearch1ActionPerformed
+    }//GEN-LAST:event_btnSearchActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrevActionPerformed
+        if (currentPage > 1) {
+            currentPage--;
+            loadInventoryLogsTable();
+        }
+    }//GEN-LAST:event_btnPrevActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
+        int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadInventoryLogsTable();
+        }
+    }//GEN-LAST:event_btnNextActionPerformed
 
     private void cmbUserFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbUserFilterActionPerformed
         // TODO add your handling code here:
@@ -510,14 +593,13 @@ public class InventoryPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnSearch1;
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JComboBox<String> cmbProductFilter;
     private javax.swing.JComboBox<String> cmbUserFilter;
     private com.toedter.calendar.JDateChooser dateFrom;
     private com.toedter.calendar.JDateChooser dateTo;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -536,6 +618,7 @@ public class InventoryPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblPageText;
     private javax.swing.JRadioButton rbtnAll;
     private javax.swing.JRadioButton rbtnIn;
     private javax.swing.JRadioButton rbtnOut;

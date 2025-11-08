@@ -8,8 +8,12 @@ import java.sql.SQLException;
 public class DbConnection {
     private final String URL = "jdbc:mysql://localhost:3306/db_gproject";
     private final String USERNAME = "root";
+<<<<<<< Updated upstream
     private final String PASSWORD = "";
 //    private final String PASSWORD = "Dashataran1122@";
+=======
+    private final String PASSWORD = "Dashataran1122@";
+>>>>>>> Stashed changes
     
     private Connection conn;
     

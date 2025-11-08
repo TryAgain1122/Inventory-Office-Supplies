@@ -158,6 +158,11 @@ public LoginForm() {
         btnLogin.setBackground(new java.awt.Color(207, 207, 207));
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnLogin.setText("LOG IN");
+        btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnLoginMouseEntered(evt);
+            }
+        });
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
@@ -282,6 +287,11 @@ public LoginForm() {
             ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
         }
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void btnLoginMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseEntered
+        
+        
+    }//GEN-LAST:event_btnLoginMouseEntered
 
     /**
      * @param args the command line arguments

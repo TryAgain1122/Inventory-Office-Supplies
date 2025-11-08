@@ -5,7 +5,6 @@ import AdminPanel.CategotryPanel;
 import AdminPanel.InventoryPanel;
 import AdminPanel.InventoryPanel;
 import AdminPanel.ProductPanel;
-import AdminPanel.RequestPanel;
 import AdminPanel.UserPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,8 +22,7 @@ public class AdminDashboard extends javax.swing.JFrame {
     private InventoryPanel inventoryPanel = new InventoryPanel();
     private ProductPanel productPanel = new ProductPanel(inventoryPanel);
     private CategotryPanel categotryPanel = new CategotryPanel(productPanel);
-    private RequestPanel requestPanel = new RequestPanel();
-    private LoginForm loginForm = new LoginForm();
+    
     
     public AdminDashboard() {
         initComponents();
@@ -112,8 +110,8 @@ public class AdminDashboard extends javax.swing.JFrame {
         txtProductClick = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         lblInventoryClick = new javax.swing.JLabel();
-        lblRequestsClick = new javax.swing.JLabel();
-        lblLogout1 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         lblDashboard = new javax.swing.JLabel();
         lblReports = new javax.swing.JLabel();
         lblUser = new javax.swing.JLabel();
@@ -163,21 +161,11 @@ public class AdminDashboard extends javax.swing.JFrame {
             }
         });
 
-        lblRequestsClick.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblRequestsClick.setText("Requests");
-        lblRequestsClick.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblRequestsClickMouseClicked(evt);
-            }
-        });
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel7.setText("Requests");
 
-        lblLogout1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblLogout1.setText("Logout");
-        lblLogout1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblLogout1MouseClicked(evt);
-            }
-        });
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setText("Logout");
 
         lblDashboard.setText("0");
 
@@ -218,35 +206,31 @@ public class AdminDashboard extends javax.swing.JFrame {
                                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(lblDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sideBarPanelLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
                         .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
                             .addComponent(jLabel2)
                             .addComponent(jLabel1)
                             .addComponent(lblUserClick, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCategoryClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(sideBarPanelLayout.createSequentialGroup()
                         .addGap(33, 33, 33)
+                        .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(sideBarPanelLayout.createSequentialGroup()
-                                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(lblLogout1))
-                            .addGroup(sideBarPanelLayout.createSequentialGroup()
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(lblInventoryClick)
-                                    .addComponent(lblRequestsClick)
-                                    .addComponent(txtProductClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                            .addComponent(jLabel5)
+                            .addComponent(lblInventoryClick)
+                            .addComponent(jLabel7)
+                            .addComponent(txtProductClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(100, Short.MAX_VALUE))
         );
         sideBarPanelLayout.setVerticalGroup(
@@ -282,13 +266,13 @@ public class AdminDashboard extends javax.swing.JFrame {
                     .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblRequestsClick, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLogout1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addGap(56, 56, 56))
         );
 
         javax.swing.GroupLayout mainSwitchPanelLayout = new javax.swing.GroupLayout(mainSwitchPanel);
@@ -342,11 +326,6 @@ public class AdminDashboard extends javax.swing.JFrame {
         switchPanel(userPanel);
     }//GEN-LAST:event_lblUserClickMouseClicked
 
-    private void logoutAction (){
-        loginForm.setVisible(true);
-        this.dispose();
-    }
-    
     private void lblInventoryClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblInventoryClickMouseClicked
         switchPanel(inventoryPanel);
         
@@ -359,14 +338,6 @@ public class AdminDashboard extends javax.swing.JFrame {
     private void txtCategoryClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCategoryClickMouseClicked
          switchPanel(categotryPanel);
     }//GEN-LAST:event_txtCategoryClickMouseClicked
-
-    private void lblLogout1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLogout1MouseClicked
-        logoutAction();
-    }//GEN-LAST:event_lblLogout1MouseClicked
-
-    private void lblRequestsClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRequestsClickMouseClicked
-        switchPanel(requestPanel);
-    }//GEN-LAST:event_lblRequestsClickMouseClicked
 
     /**
      * @param args the command line arguments
@@ -391,17 +362,17 @@ public class AdminDashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel lblCategory;
     private javax.swing.JLabel lblDashboard;
     private javax.swing.JLabel lblHome;
     private javax.swing.JLabel lblInventory;
     private javax.swing.JLabel lblInventoryClick;
     private javax.swing.JLabel lblLogout;
-    private javax.swing.JLabel lblLogout1;
     private javax.swing.JLabel lblProducts;
     private javax.swing.JLabel lblReports;
     private javax.swing.JLabel lblRequests;
-    private javax.swing.JLabel lblRequestsClick;
     private javax.swing.JLabel lblUser;
     private javax.swing.JLabel lblUserClick;
     private javax.swing.JPanel mainPanel;

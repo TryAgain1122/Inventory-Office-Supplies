@@ -78,6 +78,7 @@
                                           <Component id="lblDashboard" min="-2" pref="29" max="-2" attributes="0"/>
                                           <Component id="lblUser" min="-2" pref="29" max="-2" attributes="0"/>
                                           <Component id="lblCategory" min="-2" pref="29" max="-2" attributes="0"/>
+                                          <Component id="lblLogout" min="-2" pref="29" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <Group type="102" alignment="1" attributes="0">
@@ -87,6 +88,7 @@
                               </Group>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                                   <Component id="lblUserClick" alignment="0" min="-2" pref="51" max="-2" attributes="0"/>
@@ -95,27 +97,18 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="lblReports" min="-2" pref="29" max="-2" attributes="0"/>
+                                  <Component id="lblInventory" min="-2" pref="29" max="-2" attributes="0"/>
+                                  <Component id="lblRequests" min="-2" pref="29" max="-2" attributes="0"/>
+                                  <Component id="lblProducts" min="-2" pref="29" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="lblLogout" min="-2" pref="29" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="lblLogout1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="lblReports" min="-2" pref="29" max="-2" attributes="0"/>
-                                          <Component id="lblInventory" min="-2" pref="29" max="-2" attributes="0"/>
-                                          <Component id="lblRequests" min="-2" pref="29" max="-2" attributes="0"/>
-                                          <Component id="lblProducts" min="-2" pref="29" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lblInventoryClick" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lblRequestsClick" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtProductClick" alignment="0" min="-2" pref="92" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
+                                  <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblInventoryClick" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtProductClick" alignment="0" min="-2" pref="92" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -163,15 +156,15 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblRequestsClick" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
+                          <Component id="jLabel7" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
                           <Component id="lblRequests" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace pref="108" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblLogout1" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
+                          <Component id="jLabel8" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
                           <Component id="lblLogout" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="157" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -234,27 +227,21 @@
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblInventoryClickMouseClicked"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblRequestsClick">
+            <Component class="javax.swing.JLabel" name="jLabel7">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="1"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Requests"/>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblRequestsClickMouseClicked"/>
-              </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblLogout1">
+            <Component class="javax.swing.JLabel" name="jLabel8">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="1"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Logout"/>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblLogout1MouseClicked"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblDashboard">
               <Properties>
