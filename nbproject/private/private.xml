@@ -3,19 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/D:/Downloads/NetBeansProjects/Inventory-Office-Supplies/src/StaffPanel/StaffDefaultPanel.java</file>
-            <file>file:/D:/Downloads/NetBeansProjects/Inventory-Office-Supplies/src/StaffPanel/StockOutPanel.java</file>
-            <file>file:/D:/Downloads/NetBeansProjects/Inventory-Office-Supplies/src/inventory_office_supplies/StaffPanel.java</file>
-            <file>file:/D:/Downloads/NetBeansProjects/Inventory-Office-Supplies/src/StaffPanel/InventoryPanel.java</file>
-            <file>file:/D:/Downloads/NetBeansProjects/Inventory-Office-Supplies/src/StaffPanel/RequestsPanel.java</file>
-=======
-            <file>file:/C:/Users/luisr/Downloads/Inventory_office_supplies/src/Styles/ButtonStyles.java</file>
-            <file>file:/C:/Users/luisr/Downloads/Inventory_office_supplies/src/inventory_office_supplies/AdminDashboard.java</file>
-            <file>file:/C:/Users/luisr/Downloads/Inventory_office_supplies/src/AdminPanel/InventoryPanel.java</file>
-            <file>file:/C:/Users/luisr/Downloads/Inventory_office_supplies/src/AdminPanel/CategotryPanel.java</file>
-            <file>file:/C:/Users/luisr/Downloads/Inventory_office_supplies/src/AdminPanel/ProductPanel.java</file>
->>>>>>> 2d9cb871967899d75a3ec4b2d4bfff2e8e03fdb9
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/inventory_office_supplies/Inventory_office_supplies.java</file>
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/inventory_office_supplies/StaffPanelDashboard.java</file>
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/StaffPanel/RequestsPanel.java</file>
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/StaffPanel/InventoryPanel.java</file>
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/Database_config/DbConnection.java</file>
+            <file>file:/D:/PROGRAMMING/%7FGROUP%20PROJECT/1st%20Copy/Inventory-Office-Supplies/src/AdminPanel/CategotryPanel.java</file>
         </group>
     </open-files>
 </project-private>
