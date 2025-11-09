@@ -8,6 +8,7 @@ package AdminPanel;
 import Database_config.DbConnection;
 import Styles.ButtonStyles;
 import Styles.ModalCustom;
+import Styles.TableStyles;
 import Styles.TextFieldStyle;
 import java.awt.Color;
 import java.awt.Font;
@@ -19,10 +20,6 @@ import java.sql.Statement;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author luisr
- */
 public class ProductPanel extends javax.swing.JPanel {
     
     private InventoryPanel inventoryPanel = new InventoryPanel();
@@ -35,6 +32,7 @@ public class ProductPanel extends javax.swing.JPanel {
     public ProductPanel(InventoryPanel inventoryPanel) {
         initComponents();
         this.inventoryPanel = inventoryPanel;
+        
         setUpProductTable();
         loadCategoriesToComboBox();
         loadProducts();
@@ -46,7 +44,9 @@ public class ProductPanel extends javax.swing.JPanel {
         TextFieldStyle.customInputFields(txtSupplier, "Supplier name");
         
         ButtonStyles.setDark(btnPrev);
-        ButtonStyles.setDark(btnNext);
+        ButtonStyles.setDark(btnNext);     
+        TableStyles.applyDefault(tblProduct);
+        TableStyles.autoResizeColumns(tblProduct);
         
         
         ButtonStyles.setDark(btnSearch);
@@ -55,6 +55,49 @@ public class ProductPanel extends javax.swing.JPanel {
         ButtonStyles.setDelete(btnDelete);
         
         initCustomBehavior();
+    }
+    
+    private void initCustomBehavior () {
+        btnUpdate.setEnabled(false);
+        btnDelete.setEnabled(false);
+        
+        tblProduct.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = tblProduct.getSelectedRow();
+                boolean hasSelection = selectedRow != -1;
+                btnUpdate.setEnabled(hasSelection);
+                btnDelete.setEnabled(hasSelection);
+                
+//                if (hasSelection && !isEditing) {
+//                    editingProductId = (int) tblProduct.getValueAt(selectedRow, 0);
+//                    txtProductName.setText(tblProduct.getValueAt(selectedRow, 1).toString());
+//                    spinnerQty.setValue(Integer.parseInt(tblProduct.getValueAt(selectedRow, 2).toString()));
+//                    txtUnit.setText(tblProduct.getValueAt(selectedRow, 3).toString());
+//                    txtPrice.setText(tblProduct.getValueAt(selectedRow, 4).toString());
+//                    txtSupplier.setText(tblProduct.getValueAt(selectedRow, 5).toString());
+//                }
+            }
+        });
+    }
+    
+    public void loadCategoriesToComboBox() {
+        DbConnection db = new DbConnection();
+        Connection conn = db.getConnection();
+        
+        try {
+            String sql = "SELECT category_name FROM categories_tbl";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            
+            selectCategory.removeAllItems();
+            selectCategory.addItem("Select Category");
+            
+            while(rs.next()) {
+                selectCategory.addItem(rs.getString("category_name"));
+            }
+        } catch(SQLException e) {
+            ModalCustom.showError("Error loading categories: ", "Invalid");
+        }
     }
     
     private void loadProducts() {
@@ -93,13 +136,15 @@ public class ProductPanel extends javax.swing.JPanel {
                     rs.getInt("quantity"),
                     rs.getString("unit"),
                     rs.getDouble("price"),
+                    rs.getString("supplier_name"),
                     rs.getString("date_added")
                 });
             }
             
             updatePageInfo();
+            db.closeConnection();
         } catch (SQLException e) {
-            ModalCustom.showError("Invalid Connection: " + e.getMessage(), "Connection Error");
+            ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
         }
     }
     
@@ -113,6 +158,21 @@ public class ProductPanel extends javax.swing.JPanel {
         
     }
     
+    private void resetFields() {
+        txtProductName.setText("");
+        txtUnit.setText("");
+        txtPrice.setText("");
+        spinnerQty.setValue(0);
+        selectCategory.setSelectedIndex(0);
+        
+        btnAdd.setEnabled(true);
+        btnDelete.setEnabled(true);
+        btnUpdate.setText("Update");
+        
+        isEditing = false;
+        editingProductId = -1;
+    }
+    
     private void setUpProductTable () {
         DefaultTableModel model = new DefaultTableModel();
         
@@ -121,6 +181,7 @@ public class ProductPanel extends javax.swing.JPanel {
         model.addColumn("Quantity");
         model.addColumn("Unit");
         model.addColumn("Price");
+        model.addColumn("Supplier Name");
         model.addColumn("Date");
         
         tblProduct.setModel(model);
@@ -147,7 +208,7 @@ public class ProductPanel extends javax.swing.JPanel {
         Connection conn = db.getConnection();
         
         try {
-           String sql = "SELECT product_id,product_name, quantity, unit, price, date_added FROM products_tbl";
+           String sql = "SELECT product_id,product_name, quantity, unit, price, supplier_name, date_added FROM products_tbl";
            PreparedStatement pst = conn.prepareStatement(sql);
            ResultSet rs = pst.executeQuery();
 
@@ -158,7 +219,9 @@ public class ProductPanel extends javax.swing.JPanel {
                   rs.getInt("quantity"),
                   rs.getString("unit"),
                   rs.getString("price"),
+                  rs.getString("supplier_name"),
                   rs.getString("date_added")
+                  
               });
            }
            db.closeConnection();
@@ -169,56 +232,9 @@ public class ProductPanel extends javax.swing.JPanel {
     }
 
     
-    private void initCustomBehavior () {
-        btnUpdate.setEnabled(false);
-        btnDelete.setEnabled(false);
-        
-        tblProduct.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            @Override
-            public void valueChanged(javax.swing.event.ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    boolean hasSelection = tblProduct.getSelectedRow() != -1;
-                    btnUpdate.setEnabled(hasSelection);
-                    btnDelete.setEnabled(hasSelection);
-                }
-            }
-        });
-    }
-    
-    public void loadCategoriesToComboBox() {
-        DbConnection db = new DbConnection();
-        Connection conn = db.getConnection();
-        
-        try {
-            String sql = "SELECT category_name FROM categories_tbl";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            
-            selectCategory.removeAllItems();
-            selectCategory.addItem("Select Category");
-            
-            while(rs.next()) {
-                selectCategory.addItem(rs.getString("category_name"));
-            }
-        } catch(SQLException e) {
-            ModalCustom.showError("Error loading categories: ", "Invalid");
-        }
-    }
-    
-    private void resetFields() {
-        txtProductName.setText("");
-        txtUnit.setText("");
-        txtPrice.setText("");
-        spinnerQty.setValue(0);
-        selectCategory.setSelectedIndex(0);
-        
-        btnAdd.setEnabled(true);
-        btnDelete.setEnabled(true);
-        btnUpdate.setText("Update");
-        
-        isEditing = false;
-        editingProductId = -1;
-    }
+
+
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -427,6 +443,7 @@ public class ProductPanel extends javax.swing.JPanel {
     int quantity = (int) spinnerQty.getValue();
     String priceText = txtPrice.getText().trim();
     String selectedCategory = (String) selectCategory.getSelectedItem();
+    String supplierName = txtSupplier.getText().trim();
 
     if (productName.isEmpty() || unit.isEmpty() || priceText.isEmpty() || selectedCategory.isEmpty()) {
         ModalCustom.showWarning("Please fill all fields properly!", "Warning");
@@ -443,29 +460,23 @@ public class ProductPanel extends javax.swing.JPanel {
         PreparedStatement catPst = conn.prepareStatement(catSql);
         catPst.setString(1, selectedCategory);
         ResultSet rs = catPst.executeQuery();
-
-        int categoryId = 0;
-        if (rs.next()) {
-            categoryId = rs.getInt("category_id");
-        }
+        
+        int categoryId = rs.next() ? rs.getInt("category_id") : 0;
 
         // Insert into products_tbl
-        String sql = "INSERT INTO products_tbl (category_id, product_name, quantity, unit, price) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products_tbl (category_id, product_name, quantity, unit, price, supplier_name) VALUES(?, ?, ?, ?, ?, ?)";
         PreparedStatement pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         pst.setInt(1, categoryId);
         pst.setString(2, productName);
         pst.setInt(3, quantity);
         pst.setString(4, unit);
         pst.setDouble(5, price);
-
+        pst.setString(6, supplierName);
         int rows = pst.executeUpdate();
         if (rows > 0) {
             // Get the generated product_id
             ResultSet generatedKeys = pst.getGeneratedKeys();
-            int productId = 0;
-            if (generatedKeys.next()) {
-                productId = generatedKeys.getInt(1);
-            }
+            int productId = generatedKeys.next() ? generatedKeys.getInt(1) : 0;
 
             // Insert IN log into inventory_logs_tbl
             String logSql = "INSERT INTO inventory_logs_tbl (product_id, user_id, stock_history, quantity, remarks) VALUES (?, ?, 'IN', ?, ?)";
@@ -475,8 +486,9 @@ public class ProductPanel extends javax.swing.JPanel {
             logPst.setInt(3, quantity);
             logPst.setString(4, "Initial stock added");
             logPst.executeUpdate();
+            
             inventoryPanel.loadInventoryLogsTable();
-
+            resetFields();
             ModalCustom.showInfo("Product added successfully!", "Successfully");
 
             // Recount total rows and update pagination
@@ -516,21 +528,16 @@ public class ProductPanel extends javax.swing.JPanel {
         }
         
         editingProductId = (int) tblProduct.getValueAt(selectRow, 0);
-        String productName = tblProduct.getValueAt(selectRow, 1).toString();
-        int quantity = Integer.parseInt(tblProduct.getValueAt(selectRow, 2).toString());
-        String unit = tblProduct.getValueAt(selectRow, 3).toString();
-        double price = Double.parseDouble(tblProduct.getValueAt(selectRow, 4).toString());
+        txtProductName.setText(tblProduct.getValueAt(selectRow, 1).toString());
+        spinnerQty.setValue(Integer.parseInt(tblProduct.getValueAt(selectRow, 2).toString()));
+        txtUnit.setText(tblProduct.getValueAt(selectRow, 3).toString());
+        txtPrice.setText(tblProduct.getValueAt(selectRow, 4).toString());
+        txtSupplier.setText(tblProduct.getValueAt(selectRow, 5).toString());
         
-        
-        txtProductName.setText(productName);
-        spinnerQty.setValue(quantity);
-        txtUnit.setText(unit);
-        txtPrice.setText(String.valueOf(price));
         
         //disable add button para di magkamali 
         btnAdd.setEnabled(false);
         btnDelete.setEnabled(false);
-        
         btnUpdate.setText("Save");
         isEditing = true;
         ModalCustom.showInfo("You are now editing this product...", "Edit mode");
@@ -540,8 +547,9 @@ public class ProductPanel extends javax.swing.JPanel {
             String unit = txtUnit.getText().trim();
             int newQty = (int) spinnerQty.getValue();
             String priceText = txtPrice.getText().trim();
+            String supplierName = txtSupplier.getText().trim();
             
-            if (productName.isEmpty() || unit.isEmpty() || priceText.isEmpty()) {
+            if (productName.isEmpty() || unit.isEmpty() || priceText.isEmpty() || supplierName.isEmpty()) {
                 ModalCustom.showWarning("Please fill all fields properly!", "Waring");
                 return;
             }
@@ -556,25 +564,21 @@ public class ProductPanel extends javax.swing.JPanel {
                 PreparedStatement oldPst = conn.prepareStatement(getOldSql);
                 oldPst.setInt(1, editingProductId);
                 ResultSet rsOld = oldPst.executeQuery();
-                int oldQty = 0;
                 
-                if (rsOld.next()) {
-                    oldQty = rsOld.getInt("quantity");
-                }
+                int oldQty = rsOld.next() ? rsOld.getInt("quantity") : 0;
                 
-                String sql = "UPDATE products_tbl SET product_name = ?, quantity = ?, unit = ?, price = ? WHERE product_id = ?";
+                
+                String sql = "UPDATE products_tbl SET product_name = ?, quantity = ?, unit = ?, price = ?, supplier_name = ? WHERE product_id = ?";
                 PreparedStatement pst = conn.prepareStatement(sql);
                 pst.setString(1, productName);
                 pst.setInt(2, newQty);
                 pst.setString(3, unit);
                 pst.setDouble(4, price);
-                pst.setInt(5, editingProductId);
+                pst.setString(5, supplierName);
+                pst.setInt(6, editingProductId);
                 
-                int rows = pst.executeUpdate();
-                if (rows > 0) {
-                    
-                    int diffrence = newQty - oldQty;
-                    
+                if (pst.executeUpdate() > 0) {         
+                    int diffrence = newQty - oldQty;                   
                     if (diffrence != 0) {
                         String movement = diffrence > 0 ? "IN" : "OUT";
                         int qtyLogged = Math.abs(diffrence);
@@ -642,8 +646,10 @@ public class ProductPanel extends javax.swing.JPanel {
             
             int rows = pst.executeUpdate();
             if (rows > 0) {
+                inventoryPanel.loadInventoryLogsTable();
                 ModalCustom.showInfo("Product deleted successfully", "Deleted");
                 loadProducts();
+                resetFields();
             }
             db.closeConnection();
         } catch(SQLException e) {

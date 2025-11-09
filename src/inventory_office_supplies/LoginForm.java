@@ -8,19 +8,14 @@ package inventory_office_supplies;
 import Database_config.DbConnection;
 import Styles.GradientPanel;
 import Styles.ModalCustom;
-import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.Image;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -28,6 +23,7 @@ import javax.swing.JOptionPane;
  */
 public class LoginForm extends javax.swing.JFrame {
     
+    private StaffDashboard staffDashboard = new StaffDashboard();
 public LoginForm() {
     initComponents();
     
@@ -272,7 +268,7 @@ public LoginForm() {
                     new AdminDashboard().setVisible(true);
    
                 } else if (role.equalsIgnoreCase("Staff")) {
-                    new StaffDashboard().setVisible(true);
+                    staffDashboard.setVisible(true);
                 }
                 this.dispose();
             } 

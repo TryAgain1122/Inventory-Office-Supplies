@@ -2,16 +2,17 @@
 package inventory_office_supplies;
 
 import AdminPanel.CategotryPanel;
-import AdminPanel.InventoryPanel;
+import AdminPanel.AdminDashboardCharts;
 import AdminPanel.InventoryPanel;
 import AdminPanel.ProductPanel;
-import AdminPanel.RequestPanel;
+import AdminPanel.RequestInAdminPanel;
 import AdminPanel.UserPanel;
+import Styles.ModalCustom;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -23,16 +24,21 @@ public class AdminDashboard extends javax.swing.JFrame {
     private InventoryPanel inventoryPanel = new InventoryPanel();
     private ProductPanel productPanel = new ProductPanel(inventoryPanel);
     private CategotryPanel categotryPanel = new CategotryPanel(productPanel);
-    private RequestPanel requestPanel = new RequestPanel();
+    private RequestInAdminPanel requestPanel = new RequestInAdminPanel();
     private LoginForm loginForm = new LoginForm();
+    private AdminDashboardCharts dashboardCharts = new AdminDashboardCharts(0, "Admin");
     
     public AdminDashboard() {
         initComponents();
         
+        JScrollPane scroll = new JScrollPane(dashboardCharts);
+scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
         //Dashboard Icon 
-        ImageIcon dashboardIcon = new ImageIcon(getClass().getResource("../Images/dashboard.png"));
-        Image dashboard = dashboardIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        lblDashboard.setIcon(new ImageIcon(dashboard));
+//        ImageIcon dashboardIcon = new ImageIcon(getClass().getResource("../Images/dashboard.png"));
+//        Image dashboard = dashboardIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+//        lblDashboard.setIcon(new ImageIcon(dashboard));
         
         //Home Icon 
         ImageIcon homeIcon = new ImageIcon(getClass().getResource("../Images/home.png"));
@@ -50,9 +56,9 @@ public class AdminDashboard extends javax.swing.JFrame {
         lblCategory.setIcon(new ImageIcon(category));
         
         //Reports
-        ImageIcon reportIcon = new ImageIcon(getClass().getResource("../Images/report.png"));
-        Image report = reportIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        lblReports.setIcon(new ImageIcon(report));
+        //ImageIcon reportIcon = new ImageIcon(getClass().getResource("../Images/report.png"));
+        //Image report = reportIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        //lblReports.setIcon(new ImageIcon(report));
      
         //Inventory
         ImageIcon inventoryIcon = new ImageIcon(getClass().getResource("../Images/inventory.png"));
@@ -74,23 +80,24 @@ public class AdminDashboard extends javax.swing.JFrame {
         lblProducts.setIcon(new ImageIcon(product));
         
         //User Icon
-        ImageIcon UserIcon1 = new ImageIcon(getClass().getResource("../Images/user.png"));
-        Image user1 = UserIcon1.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        lblReports.setIcon(new ImageIcon(user1));
+//        ImageIcon UserIcon1 = new ImageIcon(getClass().getResource("../Images/user.png"));
+//        Image user1 = UserIcon1.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+//        lblReports.setIcon(new ImageIcon(user1));
         
-        userPanel = new UserPanel();
+        //Default Panel
         mainSwitchPanel.setLayout(new BorderLayout());
-        mainSwitchPanel.add(userPanel, BorderLayout.CENTER);
+        mainSwitchPanel.add(dashboardCharts, BorderLayout.CENTER);
         mainSwitchPanel.revalidate();
         mainSwitchPanel.repaint();
 
     }
     
-    public void refreshUsersTable() {
-        if (userPanel != null) {
-            userPanel.refreshUsersTable();
-        }
-    }
+//    public void refreshUsersTable() {
+//        if (userPanel != null) {
+//            userPanel.refreshUsersTable();
+//        }
+//    }
+    
     
     private void switchPanel(JPanel newPanel) {
        mainSwitchPanel.removeAll();
@@ -99,23 +106,30 @@ public class AdminDashboard extends javax.swing.JFrame {
        mainSwitchPanel.revalidate();
        mainSwitchPanel.repaint();
     }
+    
+        private void logoutAction (){
+         
+        boolean confirm = ModalCustom.showConfirm("Are you sure you want to logout", "Confirmation");
+        
+        if (confirm){
+        loginForm.setVisible(true);
+        this.dispose();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         mainPanel = new javax.swing.JPanel();
+        mainSwitchPanel = new javax.swing.JPanel();
         sideBarPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         lblUserClick = new javax.swing.JLabel();
         txtProductClick = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         lblInventoryClick = new javax.swing.JLabel();
         lblRequestsClick = new javax.swing.JLabel();
         lblLogout1 = new javax.swing.JLabel();
-        lblDashboard = new javax.swing.JLabel();
-        lblReports = new javax.swing.JLabel();
         lblUser = new javax.swing.JLabel();
         lblCategory = new javax.swing.JLabel();
         lblInventory = new javax.swing.JLabel();
@@ -124,17 +138,29 @@ public class AdminDashboard extends javax.swing.JFrame {
         lblHome = new javax.swing.JLabel();
         txtCategoryClick = new javax.swing.JLabel();
         lblProducts = new javax.swing.JLabel();
-        mainSwitchPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        sideBarPanel.setBackground(new java.awt.Color(204, 204, 204));
+        javax.swing.GroupLayout mainSwitchPanelLayout = new javax.swing.GroupLayout(mainSwitchPanel);
+        mainSwitchPanel.setLayout(mainSwitchPanelLayout);
+        mainSwitchPanelLayout.setHorizontalGroup(
+            mainSwitchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 682, Short.MAX_VALUE)
+        );
+        mainSwitchPanelLayout.setVerticalGroup(
+            mainSwitchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 726, Short.MAX_VALUE)
+        );
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setText("Dashboard");
+        sideBarPanel.setBackground(new java.awt.Color(204, 204, 204));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel2.setText("Home");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
 
         lblUserClick.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblUserClick.setText("Users");
@@ -151,9 +177,6 @@ public class AdminDashboard extends javax.swing.JFrame {
                 txtProductClickMouseClicked(evt);
             }
         });
-
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel5.setText("Reports");
 
         lblInventoryClick.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblInventoryClick.setText("Inventory Logs");
@@ -178,10 +201,6 @@ public class AdminDashboard extends javax.swing.JFrame {
                 lblLogout1MouseClicked(evt);
             }
         });
-
-        lblDashboard.setText("0");
-
-        lblReports.setText("0");
 
         lblUser.setText("0");
 
@@ -210,53 +229,39 @@ public class AdminDashboard extends javax.swing.JFrame {
         sideBarPanelLayout.setHorizontalGroup(
             sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sideBarPanelLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(sideBarPanelLayout.createSequentialGroup()
                         .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(sideBarPanelLayout.createSequentialGroup()
-                                .addGap(33, 33, 33)
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sideBarPanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblHome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel1)
                             .addComponent(lblUserClick, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCategoryClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(sideBarPanelLayout.createSequentialGroup()
-                        .addGap(33, 33, 33)
+                        .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblLogout1))
+                    .addGroup(sideBarPanelLayout.createSequentialGroup()
+                        .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(sideBarPanelLayout.createSequentialGroup()
-                                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(lblLogout1))
-                            .addGroup(sideBarPanelLayout.createSequentialGroup()
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(lblInventoryClick)
-                                    .addComponent(lblRequestsClick)
-                                    .addComponent(txtProductClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addContainerGap(100, Short.MAX_VALUE))
+                            .addComponent(lblInventoryClick)
+                            .addComponent(lblRequestsClick)
+                            .addComponent(txtProductClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
         sideBarPanelLayout.setVerticalGroup(
             sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sideBarPanelLayout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
+                .addGap(137, 137, 137)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -274,10 +279,6 @@ public class AdminDashboard extends javax.swing.JFrame {
                     .addComponent(lblProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(8, 8, 8)
-                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblInventoryClick, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblInventory, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -288,18 +289,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblLogout1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(157, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout mainSwitchPanelLayout = new javax.swing.GroupLayout(mainSwitchPanel);
-        mainSwitchPanel.setLayout(mainSwitchPanelLayout);
-        mainSwitchPanelLayout.setHorizontalGroup(
-            mainSwitchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 682, Short.MAX_VALUE)
-        );
-        mainSwitchPanelLayout.setVerticalGroup(
-            mainSwitchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
@@ -314,10 +304,9 @@ public class AdminDashboard extends javax.swing.JFrame {
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(sideBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(mainSwitchPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(mainSwitchPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(sideBarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -336,16 +325,10 @@ public class AdminDashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblUserClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUserClickMouseClicked
-       if (userPanel == null) {
-           userPanel = new UserPanel();
-       }
         switchPanel(userPanel);
     }//GEN-LAST:event_lblUserClickMouseClicked
 
-    private void logoutAction (){
-        loginForm.setVisible(true);
-        this.dispose();
-    }
+
     
     private void lblInventoryClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblInventoryClickMouseClicked
         switchPanel(inventoryPanel);
@@ -368,6 +351,10 @@ public class AdminDashboard extends javax.swing.JFrame {
         switchPanel(requestPanel);
     }//GEN-LAST:event_lblRequestsClickMouseClicked
 
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        switchPanel(userPanel);
+    }//GEN-LAST:event_jLabel2MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -388,18 +375,14 @@ public class AdminDashboard extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel lblCategory;
-    private javax.swing.JLabel lblDashboard;
     private javax.swing.JLabel lblHome;
     private javax.swing.JLabel lblInventory;
     private javax.swing.JLabel lblInventoryClick;
     private javax.swing.JLabel lblLogout;
     private javax.swing.JLabel lblLogout1;
     private javax.swing.JLabel lblProducts;
-    private javax.swing.JLabel lblReports;
     private javax.swing.JLabel lblRequests;
     private javax.swing.JLabel lblRequestsClick;
     private javax.swing.JLabel lblUser;

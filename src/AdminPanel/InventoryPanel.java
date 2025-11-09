@@ -44,12 +44,15 @@ public class InventoryPanel extends javax.swing.JPanel {
         group.add(rbtnOut);
         
          
-        TableStyles.applyDefault(tblInventoryLogs);
+        TableStyles.CustomTable(tblInventoryLogs);
+        TableStyles.autoResizeColumns(tblInventoryLogs);
+        
         
         TextFieldStyle.customInputFields(txtSearch, "Search... ");
         ButtonStyles.setDark(btnNext);
         ButtonStyles.setDark(btnPrev);
         ButtonStyles.setAdd(btnSearch);
+        
         
         ComponentStyles.styleRadio(rbtnAll);
         ComponentStyles.styleRadio(rbtnIn);
@@ -136,7 +139,7 @@ public class InventoryPanel extends javax.swing.JPanel {
 
         String searchText = txtSearch.getText().trim();
 
-        // --- COUNT total rows for pagination ---
+        
         String countSql = "SELECT COUNT(*) FROM inventory_logs_tbl il "
                 + "JOIN products_tbl p ON il.product_id = p.product_id "
                 + "JOIN users_tbl u ON il.user_id = u.user_id "
@@ -164,7 +167,7 @@ public class InventoryPanel extends javax.swing.JPanel {
         rsCount.close();
         countPst.close();
 
-        // --- Fetch rows for current page ---
+        
         int offset = (currentPage - 1) * rowsPerPage;
 
         String sql = "SELECT il.log_id, p.product_name, u.fullname AS user_name, "
@@ -210,7 +213,7 @@ public class InventoryPanel extends javax.swing.JPanel {
         pst.close();
         conn.close();
 
-        // --- Update pagination labels and buttons ---
+     
         updatePageInfo();
 
     } catch (SQLException e) {
