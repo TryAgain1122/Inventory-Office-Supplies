@@ -40,7 +40,7 @@ public class RequestHistory extends javax.swing.JPanel {
         TextFieldStyle.customInputFields(txtSearch, "Search...");
         ButtonStyles.setAdd(btnSearch);
         ComponentStyles.styleComboBox(cmbStatus);
-        ButtonStyles.setDark(btnExportToExcel);
+        ButtonStyles.setDark(btnRefresh);
         ButtonStyles.setDark(btnNext);
         ButtonStyles.setDark(btnPrev);
         TableStyles.applyDefault(tblHistory);
@@ -136,7 +136,7 @@ public class RequestHistory extends javax.swing.JPanel {
         tblHistory = new javax.swing.JTable();
         btnNext = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        btnExportToExcel = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
         lblPage = new javax.swing.JLabel();
         btnPrev = new javax.swing.JButton();
 
@@ -177,7 +177,12 @@ public class RequestHistory extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("Request History");
 
-        btnExportToExcel.setText("Export to Excel");
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
 
         lblPage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblPage.setText("1 / 10");
@@ -207,7 +212,7 @@ public class RequestHistory extends javax.swing.JPanel {
                                     .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(18, 18, 18)
                                     .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(btnExportToExcel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btnRefresh, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(201, 201, 201)
                         .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -231,7 +236,7 @@ public class RequestHistory extends javax.swing.JPanel {
                 .addGap(29, 29, 29)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnExportToExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -255,11 +260,15 @@ public class RequestHistory extends javax.swing.JPanel {
         lblPage.setText(currentPage + " / ?");
     }//GEN-LAST:event_btnNextActionPerformed
 
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        loadRequestHistory();
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnExportToExcel;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPrev;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSearch;
     private javax.swing.JComboBox<String> cmbStatus;
     private javax.swing.JLabel jLabel1;

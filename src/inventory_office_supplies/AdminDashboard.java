@@ -129,7 +129,7 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         mainPanel = new javax.swing.JPanel();
         mainSwitchPanel = new javax.swing.JPanel();
         sideBarPanel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        lblHomeClicked = new javax.swing.JLabel();
         lblUserClick = new javax.swing.JLabel();
         txtProductClick = new javax.swing.JLabel();
         lblInventoryClick = new javax.swing.JLabel();
@@ -161,11 +161,11 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         sideBarPanel.setBackground(new java.awt.Color(204, 204, 204));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel2.setText("Home");
-        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+        lblHomeClicked.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblHomeClicked.setText("Home");
+        lblHomeClicked.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel2MouseClicked(evt);
+                lblHomeClickedMouseClicked(evt);
             }
         });
 
@@ -254,7 +254,7 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
                                     .addComponent(lblHome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
+                                    .addComponent(lblHomeClicked)
                                     .addComponent(lblUserClick, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtCategoryClick, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(sideBarPanelLayout.createSequentialGroup()
@@ -287,7 +287,7 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
                 .addComponent(txtDisplayFullname)
                 .addGap(53, 53, 53)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblHomeClicked, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -375,9 +375,9 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         switchPanel(requestPanel);
     }//GEN-LAST:event_lblRequestsClickMouseClicked
 
-    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
-        switchPanel(userPanel);
-    }//GEN-LAST:event_jLabel2MouseClicked
+    private void lblHomeClickedMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblHomeClickedMouseClicked
+        switchPanel(dashboardCharts);
+    }//GEN-LAST:event_lblHomeClickedMouseClicked
 
     /**
      * @param args the command line arguments
@@ -400,9 +400,9 @@ scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblCategory;
     private javax.swing.JLabel lblHome;
+    private javax.swing.JLabel lblHomeClicked;
     private javax.swing.JLabel lblInventory;
     private javax.swing.JLabel lblInventoryClick;
     private javax.swing.JLabel lblLogout;

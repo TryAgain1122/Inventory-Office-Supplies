@@ -96,7 +96,7 @@
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lblHomeClicked" min="-2" max="-2" attributes="0"/>
                                           <Component id="lblUserClick" alignment="0" min="-2" pref="51" max="-2" attributes="0"/>
                                           <Component id="txtCategoryClick" alignment="0" min="-2" pref="92" max="-2" attributes="0"/>
                                       </Group>
@@ -142,7 +142,7 @@
                       <Component id="txtDisplayFullname" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel2" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
+                          <Component id="lblHomeClicked" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
                           <Component id="lblHome" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -181,7 +181,7 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JLabel" name="jLabel2">
+            <Component class="javax.swing.JLabel" name="lblHomeClicked">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="18" style="1"/>
@@ -189,7 +189,7 @@
                 <Property name="text" type="java.lang.String" value="Home"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel2MouseClicked"/>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblHomeClickedMouseClicked"/>
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblUserClick">

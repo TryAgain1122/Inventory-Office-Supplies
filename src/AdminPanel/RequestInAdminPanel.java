@@ -36,17 +36,6 @@ private boolean isSearching = false;
     public RequestInAdminPanel() {
         initComponents();
         loadRequestTable();
-//        loadUserCombo();
-//        loadProductCombo();
-//        txtSearch.addActionListener(e -> btnSearchActionPerformed(null));
-//        Timer timer = new Timer(5000, e -> {
-//            if (isSearching) {
-//                searchRequests();
-//            } else {
-//                loadRequestTable();
-//            }
-//        }); 
-//        timer.start();
         
         ButtonStyles.setDark(btnNext);
         ButtonStyles.setDark(btnPrev);
