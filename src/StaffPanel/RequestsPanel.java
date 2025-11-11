@@ -12,20 +12,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.JScrollPane;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.Timer;
+
 
 public class RequestsPanel extends javax.swing.JPanel {
     
     private int currentPage = 1;
-    private int rowsPerPage = 4;
+    private int rowsPerPage = 8;
     private int totalRows = 0;
     private int totalPages = 0;
-    
+    private Timer refreshTime;
+
     public RequestsPanel() {
         initComponents();
         loadProducts();
         loadRequestsTable();
+//        refreshTime = new Timer(5000, e -> loadRequestsTable());
+//        refreshTime.start();
         
         ComponentStyles.styleComboBox(cmbProducts);
         ButtonStyles.setAdd(btnSubmitRequest);
@@ -44,7 +50,7 @@ public class RequestsPanel extends javax.swing.JPanel {
         tblRequests.getColumnModel().getColumn(5).setPreferredWidth(150); // Action Date
         tblRequests.getColumnModel().getColumn(6).setPreferredWidth(300); // Remarks
         
-        ButtonStyles.setDark(btnExportToExcel);
+//        ButtonStyles.setDark(btnExportToExcel);
         ButtonStyles.setDark(btnNext);
         ButtonStyles.setDark(btnPrev);
     }
@@ -54,6 +60,8 @@ public class RequestsPanel extends javax.swing.JPanel {
             DbConnection db = new DbConnection();
             Connection conn;
             conn = db.getConnection();
+
+
             String sql = "SELECT product_id, product_name FROM products_tbl";
             PreparedStatement pst = conn.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
@@ -61,6 +69,7 @@ public class RequestsPanel extends javax.swing.JPanel {
             cmbProducts.addItem("Select Product");
             
             while(rs.next()) {
+                
                 int id = rs.getInt("product_id");
                 String name = rs.getString("product_name");
                 cmbProducts.addItem(name + " (ID: " + id + ")");
@@ -83,6 +92,8 @@ public class RequestsPanel extends javax.swing.JPanel {
         
          conn = db.getConnection();
          int currentUserId = 1;
+         
+         SimpleDateFormat displayFormat = new SimpleDateFormat("MMM, dd, yyyy hh:mm a");
          
          String countSql = "SELECT COUNT(*) FROM request_tbl WHERE user_id = ?";
          pst = conn.prepareStatement(countSql);    
@@ -119,13 +130,20 @@ public class RequestsPanel extends javax.swing.JPanel {
         rs = pst.executeQuery();
         
         while (rs.next()) {
+            Timestamp requestDate = rs.getTimestamp("request_date");
+            String requesrDate1 = requestDate != null ? displayFormat.format(requestDate) : "";
+            
+            Timestamp actionDate = rs.getTimestamp("action_date");
+            String actionDate1 = actionDate != null ? displayFormat.format(actionDate) : "";
             model.addRow(new Object[] {
                 rs.getInt("request_id"),
                 rs.getString("product_name"),
                 rs.getInt("quantity"),
                 rs.getString("status"),
-                rs.getString("request_date"),
-                rs.getString("action_date"),
+//                rs.getString("request_date"),
+                requesrDate1,
+//                rs.getString("action_date"),
+                actionDate1,
                 rs.getString("remarks")
             });
         } 
@@ -143,13 +161,6 @@ public class RequestsPanel extends javax.swing.JPanel {
     }
 
     
-
-    private void updateSearchResult(){
-//        String status = (String) statuschecker.getSelectedItem();
-//        String searchText = inputSearch.getText();
-//        String inputDateText = inputDate.getText();
-//        searchProducts(searchText, inputDateText, status);
-    }
     
     private void searchProducts(String searchText, String inputDateText, String status) {
         DefaultTableModel model = (DefaultTableModel) tblRequests.getModel();
@@ -245,7 +256,6 @@ public class RequestsPanel extends javax.swing.JPanel {
         btnNext = new javax.swing.JButton();
         lblPage = new javax.swing.JLabel();
         btnPrev = new javax.swing.JButton();
-        btnExportToExcel = new javax.swing.JButton();
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -334,9 +344,6 @@ public class RequestsPanel extends javax.swing.JPanel {
             }
         });
 
-        btnExportToExcel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnExportToExcel.setText("Export to Excel");
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -352,14 +359,6 @@ public class RequestsPanel extends javax.swing.JPanel {
                         .addComponent(jScrollPane2))
                     .addComponent(btnSubmitRequest)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 632, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btnPrev)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblPage)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnNext)
-                        .addGap(86, 86, 86)
-                        .addComponent(btnExportToExcel))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addComponent(togglePending)
                         .addGap(24, 24, 24)
@@ -367,6 +366,14 @@ public class RequestsPanel extends javax.swing.JPanel {
                             .addComponent(spinnerQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cmbProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(56, 56, 56))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(238, 238, 238)
+                .addComponent(btnPrev)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblPage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnNext)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -385,20 +392,14 @@ public class RequestsPanel extends javax.swing.JPanel {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(btnSubmitRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnExportToExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(138, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblPage)
-                            .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(92, 92, 92))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(49, 49, 49)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPage)
+                    .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -479,6 +480,7 @@ public class RequestsPanel extends javax.swing.JPanel {
         
 
         ModalCustom.showInfo("Request submitted", "Success");
+        loadRequestsTable();
 
         // clear form
         cmbProducts.setSelectedIndex(0);
@@ -510,7 +512,6 @@ public class RequestsPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnExportToExcel;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPrev;
     private javax.swing.JButton btnSubmitRequest;

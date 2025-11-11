@@ -23,9 +23,10 @@ import javax.swing.ImageIcon;
  */
 public class LoginForm extends javax.swing.JFrame {
     
-    private StaffDashboard staffDashboard = new StaffDashboard();
 public LoginForm() {
     initComponents();
+    
+//    btnLogin.addActionListener(e -> btnLoginActionPerformed(null));
     
     //For username ICon 
     ImageIcon iconUsername = new ImageIcon(getClass().getResource("../Images/user.png"));
@@ -265,10 +266,10 @@ public LoginForm() {
                 ModalCustom.showStyledInfo("Welcome " + fullname + " (" + role + ")", "Login Successfully");
                 
                 if (role.equalsIgnoreCase("Admin")) {
-                    new AdminDashboard().setVisible(true);
+                    new AdminDashboard(fullname).setVisible(true);
    
                 } else if (role.equalsIgnoreCase("Staff")) {
-                    staffDashboard.setVisible(true);
+                    new StaffDashboard(fullname).setVisible(true);
                 }
                 this.dispose();
             } 

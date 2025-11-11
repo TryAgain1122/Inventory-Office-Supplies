@@ -16,16 +16,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ButtonGroup;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author luisr
- */
+
 public class InventoryPanel extends javax.swing.JPanel {
 
     private Map<String, Integer> productMap = new HashMap<>();
@@ -35,6 +34,9 @@ public class InventoryPanel extends javax.swing.JPanel {
     private int rowsPerPage = 5;
     private int totalRows = 0;
     
+    private Timer refreshTimer;
+    
+    
     public InventoryPanel() {
         initComponents();
         
@@ -42,35 +44,32 @@ public class InventoryPanel extends javax.swing.JPanel {
         group.add(rbtnAll);
         group.add(rbtnIn);
         group.add(rbtnOut);
-        
-         
-        TableStyles.CustomTable(tblInventoryLogs);
-        TableStyles.autoResizeColumns(tblInventoryLogs);
-        
-        
+
         TextFieldStyle.customInputFields(txtSearch, "Search... ");
         ButtonStyles.setDark(btnNext);
         ButtonStyles.setDark(btnPrev);
         ButtonStyles.setAdd(btnSearch);
-        
-        
+           
         ComponentStyles.styleRadio(rbtnAll);
         ComponentStyles.styleRadio(rbtnIn);
         ComponentStyles.styleRadio(rbtnOut);
         
         ComponentStyles.styleJCalendar(dateTo);
         ComponentStyles.styleJCalendar(dateFrom);
-        
-
-        
+            
         rbtnAll.setSelected(true);
         cmbProductFilter.setSelectedIndex(0);
         cmbUserFilter.setSelectedIndex(0);
+        
+        TableStyles.applyDefault(tblInventoryLogs);
+        TableStyles.autoResizeColumns(tblInventoryLogs);
                 
         populateProductFilter();
         populateUserFilter();
         
         loadInventoryLogsTable();  
+//        refreshTimer = new Timer(5000, e -> loadInventoryLogsTable());
+//        refreshTimer.start();
     }
     
     private void populateProductFilter() {
@@ -114,8 +113,8 @@ public class InventoryPanel extends javax.swing.JPanel {
         
     }
     
-    public void loadInventoryLogsTable() {
-         DefaultTableModel model = (DefaultTableModel) tblInventoryLogs.getModel();
+ public void loadInventoryLogsTable() {
+    DefaultTableModel model = (DefaultTableModel) tblInventoryLogs.getModel();
     model.setRowCount(0); // clear table
     DbConnection db = new DbConnection();
     Connection conn = db.getConnection();
@@ -133,13 +132,17 @@ public class InventoryPanel extends javax.swing.JPanel {
         if (rbtnIn.isSelected()) stockType = "IN";
         else if (rbtnOut.isSelected()) stockType = "OUT";
 
+        // Format para sa display sa JTable
+        SimpleDateFormat displayFormat = new SimpleDateFormat("MMM, dd, yyyy hh:mm a");
+
+        // SQL date filter sa query, mas safe sa database: YYYY-MM-DD HH:MM:SS
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String fromDate = dateFrom.getDate() != null ? sdf.format(dateFrom.getDate()) + " 00:00:00" : "1970-01-01 00:00:00";
         String toDate = dateTo.getDate() != null ? sdf.format(dateTo.getDate()) + " 23:59:59" : "9999-12-31 23:59:59";
 
         String searchText = txtSearch.getText().trim();
 
-        
+        // Count total rows for pagination
         String countSql = "SELECT COUNT(*) FROM inventory_logs_tbl il "
                 + "JOIN products_tbl p ON il.product_id = p.product_id "
                 + "JOIN users_tbl u ON il.user_id = u.user_id "
@@ -167,11 +170,16 @@ public class InventoryPanel extends javax.swing.JPanel {
         rsCount.close();
         countPst.close();
 
-        
         int offset = (currentPage - 1) * rowsPerPage;
 
-        String sql = "SELECT il.log_id, p.product_name, u.fullname AS user_name, "
-                + "il.stock_history, il.quantity, il.date_inventory_logs "
+        // Main query
+        String sql = "SELECT il.log_id, "
+                            + "p.product_name, "
+                            + "p.supplier_name, "
+                            + "u.fullname AS user_name, "
+                            + "il.stock_history, "
+                            + "il.quantity, "
+                            + "il.date_inventory_logs "
                 + "FROM inventory_logs_tbl il "
                 + "JOIN products_tbl p ON il.product_id = p.product_id "
                 + "JOIN users_tbl u ON il.user_id = u.user_id "
@@ -196,30 +204,59 @@ public class InventoryPanel extends javax.swing.JPanel {
         }
         pst.setInt(idx++, rowsPerPage);
         pst.setInt(idx++, offset);
+        
+        int sumTotalIn = 0;
+        int sumTotalOut = 0;
+        int totalItems = 0;
+        Timestamp lastUpdated = null;
 
         ResultSet rs = pst.executeQuery();
         while (rs.next()) {
+            java.sql.Timestamp timestamp = rs.getTimestamp("date_inventory_logs");
+            if (lastUpdated == null || (timestamp != null && timestamp.after(lastUpdated))) {
+                lastUpdated = timestamp;
+            }
+           
+            int qty = rs.getInt("quantity");
+            String type = rs.getString("stock_history");
+            
+            if ("IN".equalsIgnoreCase(type)) sumTotalIn += qty;
+            if ("OUT".equalsIgnoreCase(type)) sumTotalOut += qty;
+            
+            if ("IN".equalsIgnoreCase(type)) totalItems += qty;
+            else if ("OUT".equalsIgnoreCase(type)) totalItems -= qty;
+            
+            String formattedDate = timestamp != null ? displayFormat.format(timestamp) : "";
+            
             model.addRow(new Object[] {
                 rs.getInt("log_id"),
                 rs.getString("product_name"),
                 rs.getString("user_name"),
-                rs.getString("stock_history"),
-                rs.getInt("quantity"),
-                rs.getTimestamp("date_inventory_logs")
+//                rs.getString("stock_history"),
+                type,
+//                rs.getInt("quantity"),
+                qty,
+                rs.getString("supplier_name"),
+                formattedDate
             });
         }
+        
+        txtTotalItems.setText(String.valueOf(totalItems));
+        totalIn.setText(String.valueOf(sumTotalIn));
+        totalOut.setText(String.valueOf(sumTotalOut));
+        txtLastUpdated.setText(lastUpdated != null ? new SimpleDateFormat("MMM, dd, yyyy hh:mm a").format(lastUpdated) : "N/A");
 
         rs.close();
         pst.close();
         conn.close();
 
-     
         updatePageInfo();
 
     } catch (SQLException e) {
         ModalCustom.showError("Database Error: " + e.getMessage(), "Error");
     }
-    }
+}
+
     
     private void updatePageInfo () {
         int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
@@ -241,15 +278,15 @@ public class InventoryPanel extends javax.swing.JPanel {
         txtSearch = new javax.swing.JTextField();
         cmbProductFilter = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        txtLastUpdated = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        txtTotalItems = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
+        totalIn = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
+        totalOut = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblInventoryLogs = new javax.swing.JTable();
         btnPrev = new javax.swing.JButton();
@@ -280,8 +317,8 @@ public class InventoryPanel extends javax.swing.JPanel {
 
         cmbProductFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Product", " " }));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel4.setText("0");
+        txtLastUpdated.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtLastUpdated.setText("0");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel5.setText("Last Updated: ");
@@ -289,8 +326,8 @@ public class InventoryPanel extends javax.swing.JPanel {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel6.setText("Total Items: ");
 
-        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel12.setText("0");
+        txtTotalItems.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtTotalItems.setText("0");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -302,12 +339,12 @@ public class InventoryPanel extends javax.swing.JPanel {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtLastUpdated, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(118, Short.MAX_VALUE))
+                        .addComponent(txtTotalItems, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -315,16 +352,16 @@ public class InventoryPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTotalItems, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLastUpdated, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11))
         );
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("0");
+        totalIn.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        totalIn.setText("0");
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel8.setText("Total OUT:");
@@ -332,8 +369,8 @@ public class InventoryPanel extends javax.swing.JPanel {
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel10.setText("Total IN:");
 
-        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel11.setText("0");
+        totalOut.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        totalOut.setText("0");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -345,11 +382,11 @@ public class InventoryPanel extends javax.swing.JPanel {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(totalOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(totalIn, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -358,31 +395,31 @@ public class InventoryPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(totalIn, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(totalOut, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11))
         );
 
-        tblInventoryLogs.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        tblInventoryLogs.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         tblInventoryLogs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Product Name", "User", "Type", "Qty", "Date/Time"
+                "ID", "Product Name", "User", "Type", "Qty", "Supplier Name", "Date/Time"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.Object.class, java.lang.Integer.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -410,7 +447,6 @@ public class InventoryPanel extends javax.swing.JPanel {
 
         btnNext.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnNext.setText("Next");
-        btnNext.setActionCommand("Next");
         btnNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNextActionPerformed(evt);
@@ -604,17 +640,13 @@ public class InventoryPanel extends javax.swing.JPanel {
     private com.toedter.calendar.JDateChooser dateFrom;
     private com.toedter.calendar.JDateChooser dateTo;
     private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -626,6 +658,10 @@ public class InventoryPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton rbtnIn;
     private javax.swing.JRadioButton rbtnOut;
     private javax.swing.JTable tblInventoryLogs;
+    private javax.swing.JLabel totalIn;
+    private javax.swing.JLabel totalOut;
+    private javax.swing.JLabel txtLastUpdated;
     private javax.swing.JTextField txtSearch;
+    private javax.swing.JLabel txtTotalItems;
     // End of variables declaration//GEN-END:variables
 }

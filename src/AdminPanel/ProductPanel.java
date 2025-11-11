@@ -17,6 +17,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
@@ -110,6 +112,8 @@ public class ProductPanel extends javax.swing.JPanel {
         try {
             DbConnection db = new DbConnection();
             Connection conn = db.getConnection();
+            SimpleDateFormat displayFormat = new SimpleDateFormat("MMM, dd, yyyy hh:mm a"); // 12-hour
+
             
             String countSql = "SELECT COUNT(*) FROM products_tbl";
             PreparedStatement countPst = conn.prepareStatement(countSql);
@@ -130,6 +134,8 @@ public class ProductPanel extends javax.swing.JPanel {
             ResultSet rs = pst.executeQuery();
             
             while(rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("date_added");
+                String formattedDate = timestamp != null ? displayFormat.format(timestamp) : "";
                 model.addRow(new Object[]{
                     rs.getInt("product_id"),
                     rs.getString("product_name"),
@@ -137,7 +143,8 @@ public class ProductPanel extends javax.swing.JPanel {
                     rs.getString("unit"),
                     rs.getDouble("price"),
                     rs.getString("supplier_name"),
-                    rs.getString("date_added")
+//                    rs.getString("date_added")
+                    formattedDate
                 });
             }
             
@@ -164,6 +171,7 @@ public class ProductPanel extends javax.swing.JPanel {
         txtPrice.setText("");
         spinnerQty.setValue(0);
         selectCategory.setSelectedIndex(0);
+        txtSupplier.setText("");
         
         btnAdd.setEnabled(true);
         btnDelete.setEnabled(true);

@@ -18,14 +18,37 @@ public class StaffDashboard extends javax.swing.JFrame {
     private RequestHistory requestHistory = new RequestHistory();
     private StaffDashboardChart staffDashboardChart = new StaffDashboardChart();
     private StockPanel stockPanel = new StockPanel();
+    private String fullname;
 
     
-    public StaffDashboard() {
+    public StaffDashboard(String fullname) {
+        this.fullname = fullname;
         initComponents();
+        
+        txtDisplayFullname.setText(fullname);
+        
+        ImageIcon homeIcon = new ImageIcon(getClass().getResource("../Images/home.png"));
+        Image home = homeIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        lblHome.setIcon(new ImageIcon(home));
+        
+        ImageIcon newRequestIcon = new ImageIcon(getClass().getResource("../Images/New-request.png"));
+        Image newRequest = newRequestIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        lblNewRequest.setIcon(new ImageIcon(newRequest));
+        
+        
+        ImageIcon historyICon = new ImageIcon(getClass().getResource("../Images/history.png"));
+        Image history = historyICon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        lblHistory.setIcon(new ImageIcon(history));
+        
+        ImageIcon stockIcon = new ImageIcon(getClass().getResource("../Images/stock.png"));
+        Image stock = stockIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        lblStock.setIcon(new ImageIcon(stock));
 //        
         ImageIcon logoutIcon = new ImageIcon(getClass().getResource("../Images/logout.png"));
         Image logout = logoutIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         lblLogout.setIcon(new ImageIcon(logout));
+        
+        
         
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(staffDashboardChart, BorderLayout.CENTER);
@@ -59,15 +82,17 @@ public class StaffDashboard extends javax.swing.JFrame {
         sideBarPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         lblRequestHistory = new javax.swing.JLabel();
-        lblReports = new javax.swing.JLabel();
-        lblCategory = new javax.swing.JLabel();
+        lblHistory = new javax.swing.JLabel();
+        lblNewRequest = new javax.swing.JLabel();
         lblLogout = new javax.swing.JLabel();
         lblHome = new javax.swing.JLabel();
         lblHomeClicked = new javax.swing.JLabel();
         lblNewRequestClick = new javax.swing.JLabel();
         lblStockClick = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        lblStock = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        txtDisplayFullname = new javax.swing.JLabel();
+        lblLogoutClickText = new javax.swing.JLabel();
         mainPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -84,9 +109,9 @@ public class StaffDashboard extends javax.swing.JFrame {
             }
         });
 
-        lblReports.setText("0");
+        lblHistory.setText("0");
 
-        lblCategory.setText("0");
+        lblNewRequest.setText("0");
 
         lblLogout.setText("0");
         lblLogout.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -121,10 +146,21 @@ public class StaffDashboard extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("0");
+        lblStock.setText("0");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel4.setText("Welcome");
+
+        txtDisplayFullname.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtDisplayFullname.setText("Full name");
+
+        lblLogoutClickText.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblLogoutClickText.setText("Logout");
+        lblLogoutClickText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblLogoutClickTextMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout sideBarPanelLayout = new javax.swing.GroupLayout(sideBarPanel);
         sideBarPanel.setLayout(sideBarPanelLayout);
@@ -133,58 +169,72 @@ public class StaffDashboard extends javax.swing.JFrame {
             .addGroup(sideBarPanelLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sideBarPanelLayout.createSequentialGroup()
+                        .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblLogoutClickText))
                     .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(sideBarPanelLayout.createSequentialGroup()
                             .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblHome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblLogout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblNewRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblHome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(18, 18, 18)
-                            .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblHomeClicked)
-                                    .addComponent(lblNewRequestClick, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jLabel4)))
+                            .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblHomeClicked)
+                                .addComponent(lblNewRequestClick, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGroup(sideBarPanelLayout.createSequentialGroup()
-                            .addComponent(jLabel3)
-                            .addGap(40, 40, 40)
+                            .addComponent(lblHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(lblRequestHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(sideBarPanelLayout.createSequentialGroup()
+                            .addComponent(lblStock, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
                             .addComponent(lblStockClick)
-                            .addGap(126, 126, 126))
+                            .addGap(126, 126, 126)))
+                    .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, sideBarPanelLayout.createSequentialGroup()
+                            .addGap(11, 11, 11)
+                            .addComponent(jLabel4))
                         .addGroup(sideBarPanelLayout.createSequentialGroup()
-                            .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(lblRequestHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(sideBarPanelLayout.createSequentialGroup()
-                        .addGap(74, 74, 74)
-                        .addComponent(jLabel1)))
+                            .addGap(16, 16, 16)
+                            .addComponent(txtDisplayFullname, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel1))))
                 .addContainerGap(54, Short.MAX_VALUE))
         );
         sideBarPanelLayout.setVerticalGroup(
             sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sideBarPanelLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel4)
-                    .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(5, 5, 5)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(80, 80, 80)
+                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sideBarPanelLayout.createSequentialGroup()
+                        .addGap(62, 62, 62)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(sideBarPanelLayout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtDisplayFullname, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(64, 64, 64)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblHomeClicked, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblNewRequestClick, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblNewRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblReports, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRequestHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblStockClick, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                    .addComponent(lblStock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
                 .addGroup(sideBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblStockClick, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addContainerGap(268, Short.MAX_VALUE))
+                    .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLogoutClickText, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
@@ -237,6 +287,10 @@ public class StaffDashboard extends javax.swing.JFrame {
        logOutAction();
     }//GEN-LAST:event_lblLogoutMouseClicked
 
+    private void lblLogoutClickTextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLogoutClickTextMouseClicked
+        logOutAction();
+    }//GEN-LAST:event_lblLogoutClickTextMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -268,24 +322,26 @@ public class StaffDashboard extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new StaffDashboard().setVisible(true);
+                new StaffDashboard("Test Staff").setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel lblCategory;
+    private javax.swing.JLabel lblHistory;
     private javax.swing.JLabel lblHome;
     private javax.swing.JLabel lblHomeClicked;
     private javax.swing.JLabel lblLogout;
+    private javax.swing.JLabel lblLogoutClickText;
+    private javax.swing.JLabel lblNewRequest;
     private javax.swing.JLabel lblNewRequestClick;
-    private javax.swing.JLabel lblReports;
     private javax.swing.JLabel lblRequestHistory;
+    private javax.swing.JLabel lblStock;
     private javax.swing.JLabel lblStockClick;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel sideBarPanel;
+    private javax.swing.JLabel txtDisplayFullname;
     // End of variables declaration//GEN-END:variables
 }

@@ -15,6 +15,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -25,10 +28,14 @@ public class RequestHistory extends javax.swing.JPanel {
 
     private int currentPage = 1;
     private int rowsPerPage = 6;
+    private Timer refreshTimer;
     
     public RequestHistory() {
         initComponents();
         loadRequestHistory();
+//        refreshTimer = new Timer(5000, e -> loadRequestHistory());
+//        refreshTimer.start();
+        
         
         TextFieldStyle.customInputFields(txtSearch, "Search...");
         ButtonStyles.setAdd(btnSearch);
@@ -50,6 +57,8 @@ public class RequestHistory extends javax.swing.JPanel {
         ResultSet rs;
         
         try {
+            SimpleDateFormat displayFormat = new SimpleDateFormat("MMM, dd, yyyy hh:mm a");
+            
             conn = db.getConnection();
             
             String searchText = txtSearch.getText().trim();
@@ -92,13 +101,21 @@ public class RequestHistory extends javax.swing.JPanel {
         rs = pst.executeQuery();
             
             while (rs.next()) {
+                Timestamp requests = rs.getTimestamp("request_date");
+                String requestDate = requests != null ? displayFormat.format(requests) : "";
+                
+                Timestamp actionTs = rs.getTimestamp("action_date");
+                String actionDate = actionTs != null ? displayFormat.format(actionTs) : "";
+                
                 model.addRow(new Object[] {
                     rs.getInt("request_id"),
                     rs.getString("product_name"),
                     rs.getInt("quantity"),
                     rs.getString("status"),
-                    rs.getString("request_date"),
-                    rs.getString("action_date"),
+//                    rs.getString("request_date"),
+                    requestDate,
+//                    rs.getString("action_date"),
+                    actionDate,
                     rs.getString("remarks")
                 });
             }
